@@ -50,7 +50,6 @@
     <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <!--Open Weather API Key: 90fddd8c461802cbc420e6e5c3a329b0-->
 
 </head>
 <body data-spy="scroll" data-target=".navbar" data-offset="50">
@@ -117,7 +116,7 @@ class APICall extends React.Component {
       console.log(this.state.autoCoord);
       if (city !="")
       {
-          fetch("http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=90fddd8c461802cbc420e6e5c3a329b0")
+          fetch("http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=")
       .then(res => res.json())
       .then(
         (result) => {
@@ -146,7 +145,7 @@ class APICall extends React.Component {
   
   //Get weather based on Searched City.
   callService(lat, long){
-      fetch("https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"4&lon="+long+"&units=imperial&appid=90fddd8c461802cbc420e6e5c3a329b0")
+      fetch("https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"4&lon="+long+"&units=imperial&appid=")
       .then(res => res.json())
       .then(
         (result) => {
@@ -165,7 +164,7 @@ class APICall extends React.Component {
   }
   //Get weather based on current location.
   callAutoService(){
-      fetch("https://api.openweathermap.org/data/2.5/onecall?lat="+this.state.autoCoord.latitude+"4&lon="+this.state.autoCoord.longitude+"&units=imperial&appid=90fddd8c461802cbc420e6e5c3a329b0")
+      fetch("https://api.openweathermap.org/data/2.5/onecall?lat="+this.state.autoCoord.latitude+"4&lon="+this.state.autoCoord.longitude+"&units=imperial&appid=")
       .then(res => res.json())
       .then(
         (result) => {
