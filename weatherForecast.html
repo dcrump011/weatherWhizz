@@ -34,6 +34,7 @@
       width: 50%;
       margin-right: 5px;
   }
+  
 
 </style>
 
@@ -50,7 +51,6 @@
     <script src="https://unpkg.com/react@17/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-
 </head>
 <body data-spy="scroll" data-target=".navbar" data-offset="50">
 
@@ -58,18 +58,15 @@
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">  
   <ul class="navbar-nav">
     <li class="nav-item">
-      <a class="nav-link" href="#section1">weatherForecast</a>
+      <a class="nav-link" href="#section1"><b>weatherWhizz</b> - <i>Your personal weather forecast.</i></a>
     </li>
   </ul>
 </nav>
 
-
 <div data-spy="scroll" data-target=".navbar" data-offset="50"></div>
 <div id="section1" class="jumbotron" style="Height: 100%;">
-    
 <div id="formDisplay" class="componentDiv" style="margin-left: 35%; margin-top: 15px; margin-bottom: 20px;"></div>
 <div id="apiDisplay" class="componentDiv" style="margin-top: 15px;"></div>
-
     
 <script type="text/babel">
 const e = React.createElement;
@@ -111,47 +108,35 @@ class APICall extends React.Component {
 }
 
   
-//   Call an API to get the Latitude/Longitude
+//   Call an API to get the Latitude/Longitude - This API call with throw an Error 429 when you exceed my set limit of 500 calls!
   getLatLong(city){
       console.log(this.state.autoCoord);
-      if (city !="")
-      {
-          fetch("http://api.openweathermap.org/data/2.5/weather?q=" + city + "&appid=")
+      fetch("http://api.openweathermap.org/geo/1.0/direct?q=" + city + "&limit=1&appid=90fddd8c461802cbc420e6e5c3a329b0")
       .then(res => res.json())
-      .then(
-        (result) => {
-          this.setState({
-            isLoaded2: true,
-            coord: result
-          });
-          if (!result.message)
-          {
-              this.callService(this.state.coord.coord.lat, this.state.coord.coord.lon);
+      .then((data) => 
+        {
+          if(data.length >0 && city !=""){
+            this.callService(data[0].lat, data[0].lon);
           }
-        },
-        (error2) => {
-          this.setState({
-            isLoaded2: true,
-            error2
-          });
+          else
+        {
+            this.callAutoService();
         }
-      )
-      }
-      else
-      {
-          this.callAutoService();
-      }
+        }
+        )
   }
   
   //Get weather based on Searched City.
   callService(lat, long){
-      fetch("https://api.openweathermap.org/data/2.5/onecall?lat="+lat+"4&lon="+long+"&units=imperial&appid=")
+      fetch("https://api.openweathermap.org/data/3.0/onecall?lat="+lat+"4&lon="+long+"&units=imperial&appid=90fddd8c461802cbc420e6e5c3a329b0")
       .then(res => res.json())
       .then(
         (result) => {
           this.setState({
             isLoaded: true,
-            items: result.daily
+            items: result.daily,
+            lat: lat,
+            long: long
           });
         },
         (error) => {
@@ -162,9 +147,10 @@ class APICall extends React.Component {
         }
       )
   }
+
   //Get weather based on current location.
   callAutoService(){
-      fetch("https://api.openweathermap.org/data/2.5/onecall?lat="+this.state.autoCoord.latitude+"4&lon="+this.state.autoCoord.longitude+"&units=imperial&appid=")
+      fetch("https://api.openweathermap.org/data/3.0/onecall?lat="+this.state.autoCoord.latitude+"4&lon="+this.state.autoCoord.longitude+"&units=imperial&appid=90fddd8c461802cbc420e6e5c3a329b0")
       .then(res => res.json())
       .then(
         (result) => {
@@ -187,16 +173,23 @@ class APICall extends React.Component {
       switch(weather)
       {
           case "Clear":
-              imageSrc= "Files/sunny.png";
+              //imageSrc= "Files/sunny.png";
+              imageSrc="file:///C:/Work/Misc/WeatherPics/sunny.png";
               break;
           case "Clouds":
-              imageSrc="Files/cloudy.png";
+              // imageSrc="Files/cloudy.png";
+              imageSrc="file:///C:/Work/Misc/WeatherPics/cloudy.png";
               break;
           case "Rain":
-              imageSrc="Files/rainy.png";
+              // imageSrc="Files/rainy.png";
+              imageSrc="file:///C:/Work/Misc/WeatherPics/rainy.png"; 
               break;
+          case "Snow":
+            // imageSrc="Files/snowy.png";
+            imageSrc="file:///C:/Work/Misc/WeatherPics/snowy.png";
+            break;
           default:
-              imageSrc="Files/sunny.png";
+              // imageSrc="Files/sunny.png";
               break;
       }
       return imageSrc;
@@ -215,7 +208,7 @@ class APICall extends React.Component {
   }
 
   render() {
-    const { error, error2, isLoaded, isLoaded2, items } = this.state; 
+    const { error, error2, isLoaded, isLoaded2, items, lat, long } = this.state; 
     const placeHolderArray = [0,1,2,3,4,5,6];
     
     if (!isLoaded && !isLoaded2) {
@@ -229,6 +222,9 @@ class APICall extends React.Component {
             }
         return (
           <div id="weatherContainerWeek" className="container-fluid">
+          <div>
+            <p><b>Latitude & Longitude: </b>{lat ? lat : this.state.autoCoord.latitude}, {long ? long : this.state.autoCoord.longitude}</p>
+          </div>
           {this.state.coord.message && <p><b>City not found. Please try again.</b></p>}
           <div className="row">
               {items.map((item, index) => (
@@ -289,7 +285,7 @@ class Form extends React.Component{
     render(){
         return(
             <form className="form-inline" onSubmit={this.handleSubmit}>
-            <input type="text" className="form-control" id="searchTextBox" value={this.state.value} onChange={this.handleChange} />
+            <input type="text" className="form-control" id="searchTextBox" placeholder="Input city name..." value={this.state.value} onChange={this.handleChange} />
             <button type="submit" className="btn btn-secondary">Generate Forecast</button>
             </form>
             );
@@ -297,18 +293,10 @@ class Form extends React.Component{
 }
 ReactDOM.render(<Form />, document.getElementById("formDisplay"));
 
-
-
 </script>
 </div>
-
-
-
-
-
 </body>
 </html>
-
 
 
 
